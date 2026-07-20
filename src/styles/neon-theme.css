@@ -1,0 +1,85 @@
+/* Paleta "neón cyberpunk" del catálogo público (ver diseño Catalogo EVA Store). */
+.eva-theme {
+  --eva-bg: oklch(0.16 0.09 300);
+  --eva-bg-soft: oklch(0.2 0.06 300);
+  --eva-border: oklch(0.3 0.06 300);
+  --eva-border-soft: oklch(0.5 0.05 300);
+  --eva-accent: #39ff8a;
+  --eva-text: white;
+  --eva-text-soft: oklch(0.9 0.02 300);
+  --eva-glow-purple: oklch(0.4 0.18 300 / 0.55);
+  --eva-glow-green: oklch(0.55 0.22 145 / 0.18);
+  --eva-banner-bg: oklch(0.12 0.08 300);
+  --eva-banner-border: oklch(0.5 0.22 145 / 0.4);
+  --eva-icon-bg: oklch(0.24 0.05 300);
+  --eva-font-display: 'Poppins', sans-serif;
+  --eva-font-mono: 'Space Mono', monospace;
+
+  background: var(--eva-bg);
+  color: var(--eva-text);
+  font-family: var(--eva-font-display);
+}
+
+.eva-btn {
+  font-family: var(--eva-font-mono);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border-radius: 40px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.eva-btn:hover {
+  transform: translateY(-1px);
+}
+.eva-btn--solid {
+  background: var(--eva-accent);
+  color: #0a0a0f;
+}
+.eva-btn--outline {
+  background: transparent;
+  border: 1.5px solid var(--eva-accent);
+  color: var(--eva-accent);
+}
+
+.eva-chip {
+  flex: none;
+  font-family: var(--eva-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  border: 1px solid var(--eva-border-soft);
+  border-radius: 30px;
+  color: var(--eva-text-soft);
+  white-space: nowrap;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.eva-chip:hover {
+  border-color: var(--eva-accent);
+}
+.eva-chip.is-active {
+  background: var(--eva-accent);
+  border-color: var(--eva-accent);
+  color: #0a0a0f;
+}
+
+.eva-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--eva-icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--eva-accent);
+  text-decoration: none;
+  flex: none;
+  transition: all 0.2s ease;
+}
+
+.eva-icon-btn:hover {
+  background: var(--eva-accent);
+  color: #0a0a0f;
+}
