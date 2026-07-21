@@ -17,6 +17,8 @@
       </v-empty-state>
 
       <template v-else>
+        <router-link :to="{ name: 'catalog' }" class="page__back">← VOLVER AL CATÁLOGO</router-link>
+
         <div class="cart-item" v-for="it in cart.items" :key="it.product.id">
           <div class="cart-item__top">
             <img class="cart-item__img" :src="it.product.product_images?.[0]?.url" alt="" />
@@ -90,6 +92,18 @@ onMounted(() => bcv.load())
   font-size: clamp(22px, 3vw, 28px);
   font-weight: 800;
   margin: 0 0 20px;
+}
+.page__back {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(var(--v-theme-on-background), 0.75);
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+.page__back:hover {
+  color: rgb(var(--v-theme-primary));
 }
 
 .cart-item {

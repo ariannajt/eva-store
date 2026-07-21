@@ -2,8 +2,6 @@
   <div class="eva-theme page">
     <CatalogHero v-model="categoryId" :categories="categories" @browse="scrollToGrid" />
 
-    <ComingSoonSection v-if="comingSoonProducts.length" :products="comingSoonProducts" />
-
     <div class="page__search">
       <v-icon icon="mdi-magnify" size="18" class="page__search-icon" />
       <input v-model="search" type="text" class="page__search-input" placeholder="Buscar artículos..." />
@@ -23,6 +21,8 @@
         <p>Todavía no hay productos que coincidan con la búsqueda.</p>
       </div>
     </div>
+
+    <ComingSoonSection v-if="comingSoonProducts.length" :products="comingSoonProducts" />
 
     <EncargoBanner />
   </div>
@@ -112,7 +112,7 @@ onMounted(async () => {
 }
 .page__grid-cols {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
 @media (min-width: 600px) {

@@ -17,7 +17,11 @@ defineProps({ products: { type: Array, default: () => [] } })
 
 <style scoped>
 .soon {
-  padding: 0 clamp(16px, 5vw, 56px) clamp(24px, 4vw, 40px);
+  background: var(--eva-bg-soft);
+  border: 1px solid var(--eva-border);
+  border-radius: 24px;
+  padding: clamp(20px, 3vw, 28px);
+  margin: clamp(24px, 4vw, 40px) clamp(16px, 5vw, 56px) 0;
 }
 .soon__label {
   font-family: var(--eva-font-mono);
