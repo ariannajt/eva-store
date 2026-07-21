@@ -2,6 +2,8 @@
   <div class="eva-theme page">
     <CatalogHero v-model="categoryId" :categories="categories" @browse="scrollToGrid" />
 
+    <ComingSoonSection v-if="comingSoonProducts.length" :products="comingSoonProducts" />
+
     <div class="page__search">
       <v-icon icon="mdi-magnify" size="18" class="page__search-icon" />
       <input v-model="search" type="text" class="page__search-input" placeholder="Buscar artículos..." />
@@ -31,10 +33,12 @@ import { ref, watch, onMounted } from 'vue'
 import ProductCard from '@/components/ProductCard.vue'
 import CatalogHero from '@/components/public/CatalogHero.vue'
 import EncargoBanner from '@/components/public/EncargoBanner.vue'
-import { fetchPublicProducts } from '@/services/products'
+import ComingSoonSection from '@/components/public/ComingSoonSection.vue'
+import { fetchPublicProducts, fetchComingSoonProducts } from '@/services/products'
 import { fetchCategories } from '@/services/categories'
 
 const products = ref([])
+const comingSoonProducts = ref([])
 const categories = ref([])
 const search = ref('')
 const categoryId = ref('')
@@ -62,6 +66,7 @@ watch([search, categoryId], () => {
 
 onMounted(async () => {
   categories.value = await fetchCategories().catch(() => [])
+  comingSoonProducts.value = await fetchComingSoonProducts().catch(() => [])
   load()
 })
 </script>
@@ -74,7 +79,7 @@ onMounted(async () => {
 .page__search {
   position: relative;
   max-width: 480px;
-  margin: 0 auto clamp(20px, 3vw, 32px);
+  margin: 25px auto clamp(20px, 3vw, 32px);
   padding: 0 20px;
   display: flex;
   align-items: center;
@@ -107,7 +112,7 @@ onMounted(async () => {
 }
 .page__grid-cols {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 14px;
 }
 @media (min-width: 600px) {
@@ -118,7 +123,7 @@ onMounted(async () => {
 }
 @media (min-width: 960px) {
   .page__grid-cols {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 24px;
   }
 }

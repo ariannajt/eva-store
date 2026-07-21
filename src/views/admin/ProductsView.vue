@@ -35,9 +35,10 @@
         <v-chip :color="item.stock > 0 ? 'success' : 'grey'" size="small" variant="tonal">{{ item.stock }}</v-chip>
       </template>
       <template #item.active="{ item }">
-        <v-chip :color="item.active ? 'success' : 'grey'" size="small" variant="flat">
+        <v-chip :color="item.active ? 'success' : 'grey'" size="small" variant="flat" class="mb-1">
           {{ item.active ? 'Visible' : 'Oculto' }}
         </v-chip>
+        <v-chip v-if="item.coming_soon" color="success" size="small" variant="flat">Próximamente</v-chip>
       </template>
       <template #item.actions="{ item }">
         <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />

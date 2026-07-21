@@ -29,32 +29,46 @@
         <div class="detail__info">
           <div v-if="product.categories" class="detail__category">{{ product.categories.name }}</div>
           <h1 class="detail__title">{{ product.name }}</h1>
-          <div class="detail__price">{{ formatMoney(effectivePrice(product)) }}</div>
-          <span v-if="product.discount_active" class="detail__old-price">{{ formatMoney(product.price) }}</span>
-          <div v-if="bcv.rate" class="detail__price-bs">{{ formatBs(effectivePrice(product) * bcv.rate) }}</div>
+
+          <template v-if="product.coming_soon">
+            <div class="detail__soon-badge">PRÓXIMAMENTE</div>
+          </template>
+          <template v-else>
+            <div class="detail__price">{{ formatMoney(effectivePrice(product)) }}</div>
+            <span v-if="product.discount_active" class="detail__old-price">{{ formatMoney(product.price) }}</span>
+            <div v-if="bcv.rate" class="detail__price-bs">{{ formatBs(effectivePrice(product) * bcv.rate) }}</div>
+          </template>
           <div class="detail__shipping">ENVÍOS NACIONALES</div>
 
           <p class="detail__description">{{ product.description }}</p>
 
-          <div class="detail__stock-row">
-            <v-number-input
-              v-if="product.stock > 0"
-              v-model="quantity"
-              :min="1"
-              :max="product.stock"
-              control-variant="split"
-              density="comfortable"
-              style="max-width: 160px"
-            />
-            <span class="detail__stock-text">
-              {{ product.stock > 0 ? `${product.stock} disponibles` : 'Agotado' }}
-            </span>
-          </div>
+          <template v-if="product.coming_soon">
+            <p class="detail__soon-text">Todavía no está disponible para la venta. Escribenos si quieres que te avisemos.</p>
+            <a class="eva-btn eva-btn--solid detail__buy" :href="soonLink" target="_blank" rel="noopener">
+              Preguntar por WhatsApp
+            </a>
+          </template>
+          <template v-else>
+            <div class="detail__stock-row">
+              <v-number-input
+                v-if="product.stock > 0"
+                v-model="quantity"
+                :min="1"
+                :max="product.stock"
+                control-variant="split"
+                density="comfortable"
+                style="max-width: 160px"
+              />
+              <span class="detail__stock-text">
+                {{ product.stock > 0 ? `${product.stock} disponibles` : 'Agotado' }}
+              </span>
+            </div>
 
-          <div v-if="product.stock > 0" class="detail__actions">
-            <button class="eva-btn eva-btn--solid detail__buy" @click="buyNow">Comprar ahora</button>
-            <button class="eva-btn eva-btn--outline detail__add" @click="addToCart">Agregar al carrito</button>
-          </div>
+            <div v-if="product.stock > 0" class="detail__actions">
+              <button class="eva-btn eva-btn--solid detail__buy" @click="buyNow">Comprar ahora</button>
+              <button class="eva-btn eva-btn--outline detail__add" @click="addToCart">Agregar al carrito</button>
+            </div>
+          </template>
         </div>
       </div>
     </template>
@@ -72,7 +86,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { fetchPublicProductById, incrementProductViews } from '@/services/products'
 import { useCartStore } from '@/stores/cart'
 import { useBcvRateStore } from '@/stores/bcvRate'
-import { effectivePrice, formatMoney, formatBs } from '@/utils/format'
+import { effectivePrice, formatMoney, formatBs, whatsappLink } from '@/utils/format'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,6 +102,9 @@ const activeIndex = ref(0)
 
 const images = computed(() => product.value?.product_images ?? [])
 const activeImage = computed(() => images.value[activeIndex.value]?.url)
+const soonLink = computed(() =>
+  whatsappLink(`Hola, quiero saber cuándo va a estar disponible "${product.value?.name}".`),
+)
 
 watch(images, () => {
   activeIndex.value = 0
@@ -228,6 +245,23 @@ onMounted(async () => {
   color: rgba(var(--v-theme-on-background), 0.75);
   margin-top: -10px;
 }
+.detail__soon-badge {
+  display: inline-flex;
+  width: fit-content;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  background: oklch(0.7 0.15 230);
+  color: #0a0a0f;
+}
+.detail__soon-text {
+  font-size: 14px;
+  color: rgba(var(--v-theme-on-background), 0.85);
+  margin: 8px 0 0;
+}
 .detail__shipping {
   display: inline-flex;
   width: fit-content;
@@ -265,8 +299,12 @@ onMounted(async () => {
 }
 .detail__buy,
 .detail__add {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
   padding: 16px;
   border-radius: 14px;
   font-size: 13px;
+  max-width: 340px;
 }
 </style>

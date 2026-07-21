@@ -1,17 +1,31 @@
 import { supabase } from '@/lib/supabase'
 
 // Trae los productos activos para el catálogo público, con sus fotos.
+// No incluye los que están marcados "Próximamente" (esos van en su propia sección).
 export async function fetchPublicProducts({ search = '', categoryId = null } = {}) {
   let query = supabase
     .from('products')
     .select('*, product_images(id, url, position), categories(id, name)')
     .eq('active', true)
+    .eq('coming_soon', false)
     .order('created_at', { ascending: false })
 
   if (search) query = query.ilike('name', `%${search}%`)
   if (categoryId) query = query.eq('category_id', categoryId)
 
   const { data, error } = await query
+  if (error) throw error
+  return data.map(sortImages)
+}
+
+// Productos "Próximamente" para la sección aparte del catálogo.
+export async function fetchComingSoonProducts() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, product_images(id, url, position), categories(id, name)')
+    .eq('active', true)
+    .eq('coming_soon', true)
+    .order('created_at', { ascending: false })
   if (error) throw error
   return data.map(sortImages)
 }

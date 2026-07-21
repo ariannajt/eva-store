@@ -97,7 +97,14 @@
           </v-col>
         </v-row>
 
-        <v-switch v-model="form.active" label="Visible en el catálogo" color="success" hide-details class="mb-4" />
+        <v-switch v-model="form.active" label="Visible en el catálogo" color="success" hide-details class="mb-2" />
+        <v-switch
+          v-model="form.coming_soon"
+          label="Próximamente (aún no se puede comprar)"
+          color="info"
+          hide-details
+          class="mb-4"
+        />
 
         <div class="mb-2 font-weight-medium">Fotos</div>
         <div class="text-caption text-medium-emphasis mb-2">
@@ -181,6 +188,7 @@ const blankForm = () => ({
   discount_active: false,
   discount_percent: 0,
   active: true,
+  coming_soon: false,
 })
 
 const form = reactive(blankForm())
@@ -212,6 +220,7 @@ function resetFromProduct() {
       discount_active: props.product.discount_active,
       discount_percent: props.product.discount_percent,
       active: props.product.active,
+      coming_soon: props.product.coming_soon,
     })
     amazonUrl.value = props.product.amazon_url ?? ''
     images.value = props.product.product_images ?? []
