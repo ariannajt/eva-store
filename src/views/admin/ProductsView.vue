@@ -40,6 +40,17 @@
         </v-chip>
         <v-chip v-if="item.coming_soon" color="success" size="small" variant="flat">Próximamente</v-chip>
       </template>
+      <template #item.owner="{ item }">
+        <v-btn-toggle
+          :model-value="item.owner"
+          density="compact"
+          color="primary"
+          @update:model-value="(val) => setOwner(item, val)"
+        >
+          <v-btn value="ari" size="small">Ari</v-btn>
+          <v-btn value="daniel" size="small">Daniel</v-btn>
+        </v-btn-toggle>
+      </template>
       <template #item.actions="{ item }">
         <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
         <v-btn icon="mdi-delete-outline" size="small" variant="text" color="error" @click="remove(item)" />
@@ -53,7 +64,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import ProductFormDialog from '@/components/admin/ProductFormDialog.vue'
-import { fetchAdminProducts, deleteProduct } from '@/services/products'
+import { fetchAdminProducts, deleteProduct, updateProduct } from '@/services/products'
 import { effectivePrice, formatMoney, margin } from '@/utils/format'
 
 const products = ref([])
@@ -71,6 +82,7 @@ const headers = [
   { title: 'Margen', key: 'margin', sortable: false },
   { title: 'Stock', key: 'stock' },
   { title: 'Estado', key: 'active' },
+  { title: 'Dueño', key: 'owner', sortable: false },
   { title: '', key: 'actions', sortable: false, width: 100 },
 ]
 
@@ -95,6 +107,17 @@ function openCreate() {
 function openEdit(item) {
   editingProduct.value = item
   dialog.value = true
+}
+
+async function setOwner(item, owner) {
+  const previous = item.owner
+  item.owner = owner ?? null
+  try {
+    await updateProduct(item.id, { owner: item.owner })
+  } catch (err) {
+    item.owner = previous
+    throw err
+  }
 }
 
 async function remove(item) {
