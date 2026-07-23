@@ -59,14 +59,31 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="!isEdit" dense>
+        <v-row dense>
+          <v-col cols="9">
+            <v-text-field
+              v-model="form.barcode"
+              label="Código de barras (opcional)"
+              variant="outlined"
+              hint="Permite vender este producto escaneándolo desde 'Venta fuera de la página'"
+              persistent-hint
+            />
+          </v-col>
+          <v-col cols="3">
+            <v-btn variant="tonal" block height="56" prepend-icon="mdi-barcode-scan" @click="scannerOpen = true">
+              Escanear
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
           <v-col cols="12">
             <v-text-field
               v-model.number="initialCost"
-              label="Costo de inversión por unidad ($) (opcional)"
+              :label="isEdit ? 'Costo del producto ($)' : 'Costo de inversión por unidad ($) (opcional)'"
               type="number"
               variant="outlined"
-              hint="Se registra como el primer lote de compra en 'Reponer stock'"
+              :hint="isEdit ? 'Para agregar stock nuevo con su costo, usa \'Reponer stock\' en su lugar' : 'Se registra como el primer lote de compra en \'Reponer stock\''"
               persistent-hint
             />
           </v-col>
@@ -79,6 +96,12 @@
               {{ formatMoney(initialMargin.amount) }} ({{ initialMargin.percent }}%)
             </b>
           </div>
+        </v-alert>
+        <v-alert v-if="isEdit && initialCost > 0" type="info" variant="tonal" density="comfortable" class="mb-4">
+          Margen estimado:
+          <b :class="initialMargin.amount >= 0 ? 'text-success' : 'text-error'">
+            {{ formatMoney(initialMargin.amount) }} ({{ initialMargin.percent }}%)
+          </b>
         </v-alert>
 
         <v-row dense align="center">
@@ -153,6 +176,7 @@
         <v-btn color="primary" :loading="saving" @click="save">Guardar</v-btn>
       </v-card-actions>
     </v-card>
+    <BarcodeScannerDialog v-model="scannerOpen" @detected="(code) => (form.barcode = code)" />
   </v-dialog>
 </template>
 
@@ -170,6 +194,7 @@ import { uploadProductImage } from '@/services/storage'
 import { fetchAmazonProduct } from '@/services/amazonImport'
 import { addPurchaseLot } from '@/services/purchaseLots'
 import { formatMoney, margin } from '@/utils/format'
+import BarcodeScannerDialog from '@/components/admin/BarcodeScannerDialog.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -185,6 +210,7 @@ const blankForm = () => ({
   category_id: null,
   price: 0,
   stock: 0,
+  barcode: '',
   discount_active: false,
   discount_percent: 0,
   active: true,
@@ -201,6 +227,7 @@ const saving = ref(false)
 const importing = ref(false)
 const importMsg = ref('')
 const importError = ref(false)
+const scannerOpen = ref(false)
 
 const initialMargin = computed(() => margin(form.price, initialCost.value))
 
@@ -217,12 +244,14 @@ function resetFromProduct() {
       category_id: props.product.category_id,
       price: props.product.price,
       stock: props.product.stock,
+      barcode: props.product.barcode ?? '',
       discount_active: props.product.discount_active,
       discount_percent: props.product.discount_percent,
       active: props.product.active,
       coming_soon: props.product.coming_soon,
     })
     amazonUrl.value = props.product.amazon_url ?? ''
+    initialCost.value = props.product.cost ?? 0
     images.value = props.product.product_images ?? []
   }
 }
@@ -286,10 +315,10 @@ function makeMain(img) {
 async function save() {
   saving.value = true
   try {
-    const payload = { ...form, amazon_url: amazonUrl.value || null }
+    const payload = { ...form, amazon_url: amazonUrl.value || null, barcode: form.barcode || null }
     let saved
     if (isEdit.value) {
-      saved = await updateProduct(props.product.id, payload)
+      saved = await updateProduct(props.product.id, { ...payload, cost: initialCost.value })
     } else {
       const hasInitialCost = initialCost.value > 0 && form.stock > 0
       // Si hay costo, el stock se carga vía "lote de compra" (igual que en
