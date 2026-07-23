@@ -44,12 +44,24 @@ async function startScanner() {
       Html5QrcodeSupportedFormats.CODABAR,
       Html5QrcodeSupportedFormats.QR_CODE,
     ],
+    // El navegador puede reportar soporte para su BarcodeDetector nativo sin
+    // que funcione de verdad (pasa seguido en Chrome/Edge de Windows: la API
+    // existe pero el componente de detección no está instalado y nunca
+    // devuelve resultados). Forzamos el decodificador propio de la librería,
+    // que sí funciona en todos lados.
+    useBarCodeDetectorIfSupported: false,
     verbose: false,
   })
   try {
     await scanner.start(
       { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 260, height: 160 } },
+      {
+        fps: 10,
+        qrbox: (viewfinderWidth, viewfinderHeight) => ({
+          width: Math.floor(viewfinderWidth * 0.85),
+          height: Math.floor(viewfinderHeight * 0.4),
+        }),
+      },
       (decodedText) => {
         emit('detected', decodedText)
         emit('update:modelValue', false)
